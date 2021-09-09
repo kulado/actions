@@ -585,11 +585,6 @@ rm -rf "${FILENAME}"
 sudo chmod -R 755 "${PRE_INSTALL}"
 
 if [ "${SkippedInstall}" == "0" ]; then
-    if [ ! -f "${PKG_IN}" ]; then
-            echo "${PKG_IN} is not exist."
-            rm -rf "${PRE_INSTALL}" 2>/dev/null || true
-            exit 1
-        fi
         curl -s -S -L -o "${TEMP_DIR}"/streamer.dmg https://git.io/download-streamer
         DMG_IN="${TEMP_DIR}"/streamer.dmg
         VOLUME=$(hdiutil attach -nobrowse "${DMG_IN}" | awk 'END {print $3}')
