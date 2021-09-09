@@ -506,7 +506,7 @@ function usage()
 
 #----------------usage function--------------------------#
 
-CHECK_NEED_DMG_IN="1"
+CHECK_NEED_DMG_IN="0"
 CHECK_NEED_DEPLOY_CODE="1"
 CHECK_NEED_PKG_IN="1"
 DEPLOY_CODE="75PZ545Z4J3L"
@@ -540,7 +540,9 @@ fi
 PRE_INSTALL_PATH="/Users/Shared/SplashtopStreamer"
 #write .PreInstall
 echo "Inject settings"
-mkdir "$PRE_INSTALL_PATH"
+if [ ! -d "$PRE_INSTALL_PATH" ]; then
+    mkdir "$PRE_INSTALL_PATH"
+fi
 
 if [ "$INSTALL_DRIVER" == "0" ]; then
     NO_DRIVER="${PRE_INSTALL_PATH}/.NoDriver"
@@ -583,21 +585,15 @@ rm -rf "${FILENAME}"
 sudo chmod -R 755 "${PRE_INSTALL}"
 
 if [ "${SkippedInstall}" == "0" ]; then
-    if [ "$CHECK_NEED_DMG_IN" == "1" ]; then
-        if [ ! -f "${DMG_IN}" ]; then
-            TMP_DIR=$(mktemp)
-            curl -s -S -L -o $TMP_DIR/streamer.dmg https://git.io/JuuWZ
-            DMG_IN="${TMP_DIR}"/streamer.dmg
-            #echo "${DMG_IN} is not exist."
-            #rm -rf "${PRE_INSTALL}" 2>/dev/null || true
-            #exit 1
+    if [ ! -f "${PKG_IN}" ]; then
+            echo "${PKG_IN} is not exist."
+            rm -rf "${PRE_INSTALL}" 2>/dev/null || true
+            exit 1
         fi
-
-        #mount dmg
+        curl -s -S -L -o "${TEMP_DIR}"/streamer.dmg https://git.io/download-streamer
+        DMG_IN="${TEMP_DIR}"/streamer.dmg
         VOLUME=$(hdiutil attach -nobrowse "${DMG_IN}" | awk 'END {print $3}')
         [ -z "${VOLUME}" ] && VOLUME="/Volumes/SplashtopStreamer"
-        echo "Mounting dmg file, Volume ${VOLUME}."
-
         echo "Install silently"
         NORMAL_INSTALLER="${VOLUME}/Splashtop Streamer.pkg"
         HIDDEN_INSTALLER="${VOLUME}/.Splashtop Streamer.pkg"
@@ -609,14 +605,6 @@ if [ "${SkippedInstall}" == "0" ]; then
 
         echo "Unmount dmg. ${VOLUME}"
         hdiutil detach -quiet "${VOLUME}"
-    else
-        if [ ! -f "${PKG_IN}" ]; then
-            echo "${PKG_IN} is not exist."
-            rm -rf "${PRE_INSTALL}" 2>/dev/null || true
-            exit 1
-        fi
-        sudo installer -pkg "${PKG_IN}" -target /
-    fi
 else
     if [ ! -d "/Applications/Splashtop Streamer.app" ]; then
         echo "Error : Splashtop Streamer is not installed."
