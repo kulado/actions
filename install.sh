@@ -507,7 +507,7 @@ function usage()
 #----------------usage function--------------------------#
 
 CHECK_NEED_DMG_IN="0"
-CHECK_NEED_DEPLOY_CODE="1"
+CHECK_NEED_DEPLOY_CODE="0"
 CHECK_NEED_PKG_IN="1"
 DEPLOY_CODE="75PZ545Z4J3L"
 COMPUTER_NAME="$(whoami)@$(scutil --get ComputerName)"
@@ -557,7 +557,7 @@ FILENAME="${TEMP_DIR}/.PreInstall.$$"
 echo "Writing file ${PRE_INSTALL}"
 #set plist header and common dict
 # 0: STP, 1: STB, 2: STE
-setPlistByStreamerType "${FILENAME}" "0"
+setPlistByStreamerType "${FILENAME}" "1"
 
 [ ! -z "${DEPLOY_CODE// }" ] && setDeployCode "${FILENAME}" "${DEPLOY_CODE// }"
 setShowDeployLoginWarning "${FILENAME}" "${SHOW_DEPLOY_WARNING// }"
